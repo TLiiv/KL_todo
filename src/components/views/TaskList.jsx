@@ -4,9 +4,8 @@ import produce from "immer";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-const token = localStorage.getItem('token');
 
-export default function TaskList() {
+export default function TaskList({accessToken}) {
     
     const [tasks, setTasks] = useState([
         {id: 1, name: "Task 1", completed: false},
@@ -14,6 +13,8 @@ export default function TaskList() {
     ]);
 
     const navigate = useNavigate();
+
+    console.log(accessToken);
 
     const handleNameChange = (task, event) => {
         console.log(event)
@@ -56,7 +57,7 @@ export default function TaskList() {
             <Button onClick={()=>navigate('/createuser')}>Create User</Button>
         </div>
         <div>
-            {!token ? (
+            {!accessToken ? (
             <Button onClick={()=>navigate('/login')}>Log In</Button>
             ):(
             <Button onClick={()=>navigate('/logout')}>Log Out</Button>

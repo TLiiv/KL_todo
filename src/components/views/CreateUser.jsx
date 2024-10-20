@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router";
 import { Form, Input, Button, Row, Col, notification } from "antd";
-import { useState } from "react";
+
 
 const url = "/users";
 
 function CreateUser() {
     
     const navigate = useNavigate();
+    
     
     const createUser = async (values) => {
         const userData = {

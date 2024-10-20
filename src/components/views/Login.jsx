@@ -1,10 +1,10 @@
 import { Form, Input, Button, Row, Col, notification } from "antd";
 import { useNavigate } from "react-router";
-import { useState } from "react";
+
 
 const url = "/users/get-token";
 
-export default function Login() {
+export default function Login({setAccessToken}) {
     const navigate = useNavigate();
 
     const onFinish = async (values) => {
@@ -26,6 +26,7 @@ export default function Login() {
                 if (data.access_token) {
                     //console.log('Access Token:', data.access_token);
                     localStorage.setItem('token', data.access_token);
+                    setAccessToken(data.access_token);
                     navigate("/");
                 } else {
                     console.error('Access token not found in the response');
