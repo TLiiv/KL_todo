@@ -1,22 +1,54 @@
 import { Form, Input, Button, Row, Col, notification } from "antd";
 import { useNavigate } from "react-router";
+import { useState } from "react";
+
+const url = "/users/get-token";
 
 export default function Login() {
     const navigate = useNavigate();
 
-    const onFinish = (values) => {
-        console.log('Success:', values);
-        notification.success({
-            message: 'Logged in'
-        });
-        notification.error({
-            message: 'Wrong username or password'
-        });
-        navigate("/");
+    const onFinish = async (values) => {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: values.username,
+                    password: values.password,
+                }),
+            });
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Success:', data);
+                notification.success({
+                    message: 'Logged in'
+                });
+                if (data.access_token) {
+                    //console.log('Access Token:', data.access_token);
+                    localStorage.setItem('token', data.access_token);
+                    navigate("/");
+                } else {
+                    console.error('Access token not found in the response');
+                }
+            } else {
+                console.error('Login failed:', errorData);
+                notification.error({
+                    message: 'Wrong username or password',
+                    description: errorData.message || 'Login failed. Please try again.',
+                });
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            notification.error({
+                message: 'Network or server error occurred',
+                description: 'Please check your connection or try again later.',
+            });
+        }
     };
 
+
     return (
-        <Row type="flex" justify="center" align="middle" style={{minHeight: '100vh'}}>
+        <Row type="flex" justify="center" align="middle" style={{ minHeight: '100vh' }}>
             <Col span={4}>
                 <h1>Login</h1>
                 <Form

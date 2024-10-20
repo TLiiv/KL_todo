@@ -2,13 +2,18 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { Input, Button, Checkbox, List, Col, Row, Space, Divider } from "antd";
 import produce from "immer";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
+const token = localStorage.getItem('token');
 
 export default function TaskList() {
+    
     const [tasks, setTasks] = useState([
         {id: 1, name: "Task 1", completed: false},
         {id: 2, name: "Task 2", completed: true},
     ]);
+
+    const navigate = useNavigate();
 
     const handleNameChange = (task, event) => {
         console.log(event)
@@ -46,6 +51,19 @@ export default function TaskList() {
     };
 
     return (
+        <>
+        <div>
+            <Button onClick={()=>navigate('/createuser')}>Create User</Button>
+        </div>
+        <div>
+            {!token ? (
+            <Button onClick={()=>navigate('/login')}>Log In</Button>
+            ):(
+            <Button onClick={()=>navigate('/logout')}>Log Out</Button>
+            )
+            }
+            
+        </div>
         <Row type="flex" justify="center" style={{minHeight: '100vh', marginTop: '6rem'}}>
             <Col span={12}>
                 <h1>Task List</h1>
@@ -67,5 +85,6 @@ export default function TaskList() {
                 />
             </Col>
         </Row>
+    </>
     )
 }

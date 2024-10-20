@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import { Form, Input, Button, Row, Col, notification } from "antd";
 import { useState } from "react";
 
-const url = "https://demo2.z-bit.ee/users";
+const url = "/users";
 
 function CreateUser() {
     
@@ -25,7 +25,7 @@ function CreateUser() {
         try {
             const response = await fetch(url, userData);
             if (response.ok) {
-                const data = await response.json();
+                //const data = await response.json();
                 //console.log('User created:', data);
                 notification.success({
                     message: 'User created successfully!' 
@@ -47,6 +47,9 @@ function CreateUser() {
    
 
     return <>
+     <div>
+            <Button onClick={()=>navigate('/')}>Back</Button>
+        </div>
         <Row type="flex" justify="center" align="middle" style={{ minHeight: '100vh' }}>
             <Col span={4}>
                 <h1>Create User</h1>
