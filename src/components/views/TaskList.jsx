@@ -13,10 +13,13 @@ export default function TaskList({accessToken}) {
         // {id: 2, name: "Task 2", completed: true},
     ]);
 
+    
+
     const navigate = useNavigate();
 
     //console.log(accessToken);
 
+    //GET tasks from api
     const getUserTasks = async () => {
         const userTasks = {
             method: 'GET',
@@ -50,11 +53,44 @@ export default function TaskList({accessToken}) {
         }
     },[accessToken])
 
+    //Add task to API
+    const addUserTaskToAPI = async (title,description) => {
+        const userTasks = {
+            method: 'POST',
+            headers: { 
+                'Content-type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+             },
+             body: JSON.stringify({
+                'title' : title,
+                'desc' : description
+             })
+        }
+        try {
+            const response = await fetch(url, userTasks);
+
+            if (response.ok) {
+                const data = await response.json();
+                setTasks(prevtasks=>[...prevtasks,data]);
+                console.log("Tasks added", data)
+            }else {
+                notification.error({
+                    message:"failed to add tasks"
+                })
+            }
+        } catch (error) {
+            notification.error({
+                message: "Something went wrong!",
+                description: error.toString() 
+            });
+        }
+    }
+
     const handleNameChange = (task, event) => {
         console.log(event)
         const newTasks = produce(tasks, draft => {
             const index = draft.findIndex(t => t.id === task.id);
-            draft[index].name = event.target.value;
+            draft[index].title = event.target.value;
         });
         setTasks(newTasks);
     };
@@ -63,19 +99,29 @@ export default function TaskList({accessToken}) {
         console.log(event)
         const newTasks = produce(tasks, draft => {
             const index = draft.findIndex(t => t.id === task.id);
-            draft[index].completed = event.target.checked;
+            draft[index].marked_as_done = event.target.checked;
         });
         setTasks(newTasks);
     };
 
     const handleAddTask = () => {
+        const newTask = {
+            id: Math.random(),
+            title: "", 
+            marked_as_done: false
+        };
+        
         setTasks(produce(tasks, draft => {
-            draft.push({
-                id: Math.random(),
-                name: "",
-                completed: false
-            });
+            draft.push(newTask);
         }));
+    };
+
+    const handleSubmitTask = (task) => {
+        if (task.title.trim()) {
+            addUserTaskToAPI(task.title, "");
+        } else {
+            notification.error({ message: "Task title cannot be empty" });
+        }
     };
 
     const handleDeleteTask = (task) => {
@@ -102,6 +148,7 @@ export default function TaskList({accessToken}) {
         <Row type="flex" justify="center" style={{minHeight: '100vh', marginTop: '6rem'}}>
             <Col span={12}>
                 <h1>Task List</h1>
+                
                 <Button onClick={handleAddTask}>Add Task</Button>
                 <Divider />
                 <List
@@ -111,8 +158,20 @@ export default function TaskList({accessToken}) {
                     renderItem={(task) => <List.Item key={task.id}>
                         <Row type="flex" justify="space-between" align="middle" style={{width: '100%'}}>
                             <Space>
-                                <Checkbox checked={task.completed} onChange={(e) => handleCompletedChange(task, e)} />
-                                <Input value={task.name} onChange={(event) => handleNameChange(task, event)} />
+                                <Checkbox 
+                                checked={task.marked_as_done} 
+                                onChange={(e) => handleCompletedChange(task, e)} 
+                                />
+                                <Input 
+                                value={task.title} 
+                                onChange={(event) => handleNameChange(task, event)} 
+                                onBlur={() => handleSubmitTask(task)}
+                                />
+                                {task.isNew ? (
+                                        <Button type="primary" onClick={() => handleSaveTask(task)}>
+                                            Save
+                                        </Button>
+                                    ) : null}
                             </Space>
                             <Button type="text" onClick={() => handleDeleteTask(task)}><DeleteOutlined /></Button>
                         </Row>
