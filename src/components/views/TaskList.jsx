@@ -1,20 +1,54 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { Input, Button, Checkbox, List, Col, Row, Space, Divider } from "antd";
+import { Input, Button, Checkbox, List, Col, Row, Space, Divider, notification } from "antd";
 import produce from "immer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
+const url = "/tasks";
 
 export default function TaskList({accessToken}) {
     
     const [tasks, setTasks] = useState([
-        {id: 1, name: "Task 1", completed: false},
-        {id: 2, name: "Task 2", completed: true},
+        // {id: 1, name: "Task 1", completed: false},
+        // {id: 2, name: "Task 2", completed: true},
     ]);
 
     const navigate = useNavigate();
 
-    console.log(accessToken);
+    //console.log(accessToken);
+
+    const getUserTasks = async () => {
+        const userTasks = {
+            method: 'GET',
+            headers: { 
+                'Content-type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+             }
+        }
+        try {
+            const response = await fetch(url, userTasks);
+
+            if (response.ok) {
+                const data = await response.json();
+                setTasks(data);
+                console.log("Tasks fetched", data)
+            }else {
+                notification.error({
+                    message:"failed to get tasks"
+                })
+            }
+        } catch (error) {
+            notification.error({
+                message: "Something went wrong!",
+                description: error.toString() 
+            });
+        }
+    }
+    useEffect(()=>{
+        if(accessToken){
+            getUserTasks();
+        }
+    },[accessToken])
 
     const handleNameChange = (task, event) => {
         console.log(event)
