@@ -1,5 +1,5 @@
 import { DeleteOutlined } from "@ant-design/icons";
-import { Input, Button, Checkbox, List, Col, Row, Space, Divider, notification } from "antd";
+import { Input, Button, Checkbox, List, Col, Row, Space, Divider, notification, message } from "antd";
 import produce from "immer";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
@@ -86,6 +86,36 @@ export default function TaskList({accessToken}) {
         }
     }
 
+    //Delete Tasks from API
+    const deleteTaskFromAPI = async (taskId) => {
+        try {const response = await fetch(`${url}/${taskId}`, {
+            method:"DELETE",
+            headers:{
+                'Content-type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        if(!response.ok){
+            notification.error({
+                message: "Failed to delete task"
+            });
+            return false;
+        }else{
+            notification.success({
+                message :"Task deleted"
+            })
+            return true;
+        }
+    } catch (error) {
+        notification.error({
+            message: "Something went wrong!",
+            description: error.toString()
+        });
+        return false;
+        }
+        
+    }
+
     const handleNameChange = (task, event) => {
         console.log(event)
         const newTasks = produce(tasks, draft => {
@@ -124,11 +154,17 @@ export default function TaskList({accessToken}) {
         }
     };
 
-    const handleDeleteTask = (task) => {
+    const handleDeleteTask = async(task) => {
         setTasks(produce(tasks, draft => {
             const index = draft.findIndex(t => t.id === task.id);
             draft.splice(index, 1);
         }));
+        const success = await deleteTaskFromAPI(task.id);
+        if (!success) {
+            setTasks(produce(tasks, draft => {
+                draft.push(task);
+            }));
+        }
     };
 
     return (
