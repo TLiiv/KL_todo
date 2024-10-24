@@ -1,5 +1,6 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import { Input, Button, Checkbox, List, Col, Row, Space, Divider, notification, message } from "antd";
+import { Input, Button, Checkbox, List, Col, Row, Space, Divider, notification, message } from "antd";
 import produce from "immer";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
@@ -25,7 +26,8 @@ export default function TaskList({ accessToken }) {
     // }, [accessToken]);
 
 
-    //console.log(accessToken);
+
+    //REST section
 
 
     //REST section
@@ -66,11 +68,18 @@ export default function TaskList({ accessToken }) {
 
     //Add task to API
     const addUserTaskToAPI = async (task) => {
+    const addUserTaskToAPI = async (task) => {
         const userTasks = {
             method: 'POST',
             headers: {
+            headers: {
                 'Content-type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                'title': task.title || '',
+                'desc': task.desc || ''
+            })
             },
             body: JSON.stringify({
                 'title': task.title || '',
@@ -123,6 +132,7 @@ export default function TaskList({ accessToken }) {
         } catch (error) {
             notification.error({
                 message: "Something went wrong!",
+                description: error.toString()
                 description: error.toString()
             });
         }
@@ -221,6 +231,12 @@ export default function TaskList({ accessToken }) {
             const index = draft.findIndex(t => t.id === task.id);
             draft.splice(index, 1);
         }));
+        const success = await deleteTaskFromAPI(task.id);
+        if (!success) {
+            setTasks(produce(tasks, draft => {
+                draft.push(task);
+            }));
+        }
         const success = await deleteTaskFromAPI(task.id);
         if (!success) {
             setTasks(produce(tasks, draft => {
