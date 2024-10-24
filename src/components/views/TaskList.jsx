@@ -1,6 +1,5 @@
 import { DeleteOutlined } from "@ant-design/icons";
 import { Input, Button, Checkbox, List, Col, Row, Space, Divider, notification, message } from "antd";
-import { Input, Button, Checkbox, List, Col, Row, Space, Divider, notification, message } from "antd";
 import produce from "immer";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
@@ -8,38 +7,21 @@ import { useNavigate } from "react-router";
 const url = "/tasks";
 
 export default function TaskList({ accessToken }) {
-
     const [tasks, setTasks] = useState([]);
     const [newTaskTitle, setNewTaskTitle] = useState("");
-
-
-
-
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     if (!accessToken) {
-    //         navigate("/login"); 
-    //     } else {
-    //         getUserTasks();  
-    //     }
-    // }, [accessToken]);
-
-
-
-    //REST section
-
-
-    //REST section
+  
+  //REST section
 
     //GET tasks from api
     const getUserTasks = async () => {
         const userTasks = {
             method: 'GET',
-            headers: {
+            headers: { 
                 'Content-type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`
-            }
+             }
         }
         try {
             const response = await fetch(url, userTasks);
@@ -48,30 +30,28 @@ export default function TaskList({ accessToken }) {
                 const data = await response.json();
                 setTasks(data);
                 console.log("Tasks fetched", data)
-            } else {
+            }else {
                 notification.error({
-                    message: "failed to get tasks"
+                    message:"failed to get tasks"
                 })
             }
         } catch (error) {
             notification.error({
                 message: "Something went wrong!",
-                description: error.toString()
+                description: error.toString() 
             });
         }
     }
-    useEffect(() => {
-        if (accessToken) {
+    useEffect(()=>{
+        if(accessToken){
             getUserTasks();
         }
-    }, [accessToken])
+    },[accessToken])
 
     //Add task to API
     const addUserTaskToAPI = async (task) => {
-    const addUserTaskToAPI = async (task) => {
         const userTasks = {
             method: 'POST',
-            headers: {
             headers: {
                 'Content-type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`
@@ -80,12 +60,8 @@ export default function TaskList({ accessToken }) {
                 'title': task.title || '',
                 'desc': task.desc || ''
             })
-            },
-            body: JSON.stringify({
-                'title': task.title || '',
-                'desc': task.desc || ''
-            })
-        }
+        };
+        
         try {
             const response = await fetch(url, userTasks);
 
@@ -132,7 +108,6 @@ export default function TaskList({ accessToken }) {
         } catch (error) {
             notification.error({
                 message: "Something went wrong!",
-                description: error.toString()
                 description: error.toString()
             });
         }
@@ -231,12 +206,6 @@ export default function TaskList({ accessToken }) {
             const index = draft.findIndex(t => t.id === task.id);
             draft.splice(index, 1);
         }));
-        const success = await deleteTaskFromAPI(task.id);
-        if (!success) {
-            setTasks(produce(tasks, draft => {
-                draft.push(task);
-            }));
-        }
         const success = await deleteTaskFromAPI(task.id);
         if (!success) {
             setTasks(produce(tasks, draft => {
