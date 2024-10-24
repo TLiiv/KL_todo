@@ -32,10 +32,10 @@ export default function Login({setAccessToken}) {
                     console.error('Access token not found in the response');
                 }
             } else {
-                console.error('Login failed:', errorData);
+                console.error('Login failed:');
                 notification.error({
                     message: 'Wrong username or password',
-                    description: errorData.message || 'Login failed. Please try again.',
+                    description: 'Login failed. Please try again.',
                 });
             }
         } catch (error) {
